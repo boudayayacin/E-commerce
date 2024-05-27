@@ -1,0 +1,55 @@
+﻿@model MiniProjet.ViewModels.LoginViewModel
+@{
+    ViewBag.Title = "User Login";
+}
+
+<style>
+    .login-container {
+        width: 400px;
+        margin: auto;
+        height:auto ;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+        background: linear-gradient(to bottom right, #ffffff, #e0e0e0);
+    }
+    h1{
+        font-weight:bold ; 
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    }
+</style>
+
+<h1 class="text-center">User Login</h1>
+
+<div class="login-container">
+    @{
+        var returnUrl = Context.Request.Query["ReturnUrl"];
+    }
+
+    <form asp-route-returnurl="@returnUrl" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox">
+                <label asp-for="RememberMe">
+                    <input asp-for="RememberMe" />
+                    @Html.DisplayNameFor(m => m.RememberMe)
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+</div>

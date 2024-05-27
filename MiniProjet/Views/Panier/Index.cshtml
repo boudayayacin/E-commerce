@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<MiniProjet.Models.PanierArt>
+
+<h2>Panier</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Désignation</th>
+            <th>Prix</th>
+            <th>Quantité</th>
+            <th>Total</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var article = item.Article;
+            var photoPath = "~/images/" + (article.Image ?? "noimage.jpg");
+            <tr>
+                <td>
+                    <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                        <div class="card-header">
+                            <h5><b></b> @article.Designation</h5>
+                        </div>
+                        <img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true" />
+                    </div>
+                </td>
+                <td>@article.Prix</td>
+                <td>@item.Quantity</td>
+                <td>@(article.Prix * item.Quantity)</td>
+                <td>
+                    <form asp-action="EditPanier" asp-route-articleId="@article.articleId" method="get">
+
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </form>
+                    <form asp-action="RemoveFromCart" method="post">
+                        <input type="hidden" name="articleId" value="@article.articleId" />
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        @{
+            decimal totalGlobal = (decimal)Model.Sum(item => item.Article.Prix * item.Quantity);
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3"><b>Total Global :</b></td>
+            <td>@totalGlobal</td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+@if (User.Identity.IsAuthenticated && User.IsInRole("User"))
+{
+    <form asp-action="Create" asp-controller="Commande" method="get">
+        <button type="submit" class="btn btn-success">Ajouter une commande</button>
+    </form>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        Vous devez vous inscrire pour passer une commande. Cliquez sur le bouton ci-dessous pour vous <a href="@Url.Action("Register", "Account")" class="btn btn-success">S'inscrire</a>
+    </div>
+    
+}
+
+
+<a asp-action="Index" asp-controller="Article" class="btn btn-primary">Continuer vos achats</a>
+

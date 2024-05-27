@@ -1,0 +1,158 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<MiniProjet.Models.Article>
+@inject SignInManager<IdentityUser> SignInManager;
+
+@{
+    ViewBag.Title = "Liste des articles";
+}
+<style>
+.card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    padding: 10px;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    padding: 10px;
+}
+
+.imageThumbnail {
+    width: 100%;
+    height: auto;
+}
+
+/* Style pour les boutons */
+.btn {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Style pour les formulaires */
+.form-inline .form-check-input {
+    margin-top: 0;
+}
+
+/* Marge autour de la liste des cartes */
+#cart {
+    margin: 20px 0;
+}
+
+    body {
+        background: linear-gradient(to bottom right, black, gray);
+        backdrop-filter: blur(10px);
+    }
+
+    .shadow {
+        border-radius: 10px;
+    }
+    form{
+        border-radius: 20px
+    }
+    #art{
+        text-decoration:none;
+        color:white;
+        font-size: 20px;
+        font-weight: bold ;
+       
+    }
+    h1{
+        text-align: center;
+        font-weight: bold;
+        color: white;
+
+    }
+    #f1{
+        width: 500px;
+    }
+
+    .touf{
+        display:flex;
+        margin: 40px;
+        justify-content: space-between;
+    }
+
+    .card-footer .btn {
+        margin: 0.5rem; /* Marge autour des boutons */
+    }
+
+    /* Style pour les boutons de carte */
+    .card-footer {
+        display: flex;
+        justify-content: center; /* Centrer les boutons horizontalement */
+    }
+        </style>
+<h1>Bienvenue sur notre site web E-commerce </h1>
+
+<a asp-action="Index" asp-controller="Article" id="art">All Article</a>
+
+<div class="touf">
+<!-- Première formulaire de recherche -->
+    <form id="f1" class="form-inline my-2 my-lg-0 p-3 mb-3 bg-white rounded" asp-action="Search" asp-controller="Article">
+        <p class="d-flex justify-content-between">
+            <input size="30" placeholder="Tapez un Nom" type="search" name="Designation" class="form-control mr-2" />
+            <select asp-items="ViewBag.CategorieId" name="CategorieId" class="form-control mr-2" style="width:300px; height:38px"></select>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Recherche</button>
+        </p>
+    </form>
+
+    <!-- Espace entre les deux formulaires -->
+    <div style="height: 20px;"></div>
+
+    <!-- Deuxième formulaire de recherche -->
+    <form id="f1" class="form-inline my-2 my-lg-0 p-3 mb-3 bg-white rounded" asp-controller="Article" asp-action="FiltrerByQuantite" method="post">
+        <div class="form-check">
+            <input type="checkbox" name="filtrer" class="form-check-input" id="filtrerCheck" />
+            <label class="form-check-label" for="filtrerCheck">Prix</label>
+            <button class="btn btn-outline-primary ml-2" type="submit">Filtrer</button>
+        </div>
+    </form>
+
+</div>
+
+
+<div class="d-flex flex-wrap" id="cart">
+    @foreach (var article in Model)
+    {
+        var photoPath = "~/images/" + (article.Image ?? "noimage.jpg");
+        <div class="card m-3 shadow" style="flex: 1 1 calc(33.333% - 1rem); min-width: 18rem; max-width: 30.5%;">
+            <div class="card-header">
+                <h5><b>Désignation :</b> @article.Designation</h5>
+                <h5><b>Prix :</b> @article.Prix</h5>
+                <h5><b>Quantité :</b> @article.Quantite</h5>
+            </div>
+            <img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true" />
+            <div class="card-footer text-center">
+                <a asp-controller="Article" asp-action="Details" asp-route-id="@article.articleId" class="btn btn-primary m-1">View</a>
+                @if (User.Identity.IsAuthenticated && User.IsInRole("User"))
+                {
+                    <form asp-action="AddToCart" asp-controller="Panier" method="post" style="display:inline;">
+                        <input type="hidden" name="articleId" value="@article.articleId" />
+                        <button type="submit" class="btn btn-success m-1">Add to Cart</button>
+                    </form>
+                }@if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
+                {
+                     <form asp-action="AddToCart" asp-controller="Panier" method="post" style="display:inline;">
+                        <input type="hidden" name="articleId" value="@article.articleId" />
+                        <button type="submit" class="btn btn-success m-1">Add to Cart</button>
+                    </form>
+                }
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-controller="Article" class="btn btn-primary m-1" asp-route-id="@article.articleId">Edit</a>
+                    <a asp-action="Delete" asp-controller="Article" class="btn btn-danger m-1" asp-route-id="@article.articleId">Delete</a>
+                }
+            </div>
+        </div>
+    }
+</div>
